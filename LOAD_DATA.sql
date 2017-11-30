@@ -1,7 +1,7 @@
 
 SET foreign_key_checks = 0;
 
-SELECT * from MOVIEDATAMODEL.PERSON;
+SELECT * from MOVIEDATAMODEL.MOVIE;
 
 LOAD DATA LOCAL INFILE "/Users/Keinan/Documents/College_Classes/Spring_2017/Databases/data/data.csv"
 INTO TABLE MOVIEDATAMODEL.MOVIE
