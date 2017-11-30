@@ -1,6 +1,7 @@
 import mysql.connector as sql
 import numpy as np
 import scipy.stats as spicy
+import matplotlib.pyplot as plt
 
 class main():
 	def __init__(self):
@@ -9,11 +10,14 @@ class main():
 
 	def solveQuestions(self):
 		q = query()
-
+		v = visualize()
 		#solve question 1 (spearman correlation coefficient between movie runtime and movie revenue)
 		duration_gross = np.asarray(q.querydb(1,0))
-		print(duration_gross)
+		duration, gross = zip(*q.querydb(1,0))
+		duration = np.asarray(duration)
+		gross = np.asarray(gross)
 		print(spicy.spearmanr(duration_gross))
+		v.scatter(duration, gross)
 
 		#solve question 2
 
@@ -84,10 +88,21 @@ class analyze():
 		pass
 		#an example of a analysis function
 
-class visulize():
+class visualize():
 	# have some different analysis functions
-	def graph(data):
-		pass
+	def scatter(self,x,y):
+		# Create data
+		N = 500
+		colors = (0,0,40)
+		print(np.amax(x),np.amax(y))
+		area = max(np.amax(x),np.amax(y))
+
+		# Plot
+		plt.scatter(x, y)
+		plt.title('Correlation between movie duration and revenue')
+		plt.xlabel('duration')
+		plt.ylabel('gross')
+		plt.show()
 		#an example of a analysis function
 
 if __name__ == '__main__':
