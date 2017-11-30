@@ -19,7 +19,7 @@ class main():
 		duration, gross = zip(*q.querydb(1,0))
 		duration = np.asarray(duration)
 		gross = np.asarray(gross)
-		print(spicy.spearmanr(duration_gross))
+		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
 		v.scatter(duration, gross, 'Duration', 'Gross')
 
 		#solve question 2
@@ -43,13 +43,19 @@ class main():
 			end_bound = start_bound + len(attr)/num_folds
 			#Training the model, tune batch size and epochs.
 			model.fit(np.concatenate((attr[:start_bound], attr[end_bound:len(attr)]), axis=0), np.concatenate((target[:start_bound], target[end_bound:len(target)]), axis=0), epochs=20, batch_size=10)
-			#Evaluate our model
+			#Evaluate our model using mean squared error
 			scores = model.evaluate(attr[start_bound:end_bound], target[start_bound:end_bound])
 			fold_accuracy.append(scores[1]*100)
 			print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 		print("Final accuracy over all %d folds = %.2f%%" %(num_folds, sum(fold_accuracy)/float(num_folds)))
 
 		#Solve question 4
+		budget_gross = np.asarray(q.querydb(4,0))
+		budget, gross = zip(*q.querydb(4,0))
+		budget = np.asarray(budget)
+		gross = np.asarray(gross)
+		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(budget_gross)[0],spicy.spearmanr(budget_gross)[1]))
+		v.scatter(budget, gross, 'Budget', 'Gross')
 
 		#Solve question 5
 
@@ -118,11 +124,14 @@ class query():
 				target.append(title[len(title)-1:])
 			return(attr,target)
 		elif num == 4:
-			#query our database for q4 data
-			query4 = ()
+			a = []
+			#query our database for q1 data
+			query4 = ("SELECT budget, gross "
+					  "FROM Movie;")
 			cursor.execute(query4)
-			for x in cursor:
-				pass
+			for title in cursor:
+				a.append(title)
+			return a
 				#do something with the data (*)
 		else:
 			#query our database for q4 data
