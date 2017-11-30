@@ -2,6 +2,9 @@ import mysql.connector as sql
 import numpy as np
 import scipy.stats as spicy
 import matplotlib.pyplot as plt
+from keras.models import Sequential
+from keras.layers import Dense
+from sklearn.preprocessing import normalize
 
 class main():
 	def __init__(self):
@@ -17,11 +20,43 @@ class main():
 		duration = np.asarray(duration)
 		gross = np.asarray(gross)
 		print(spicy.spearmanr(duration_gross))
-		v.scatter(duration, gross)
+		v.scatter(duration, gross, 'Duration', 'Gross')
 
 		#solve question 2
 
+		#solve question 3
+		#Normalize data from database.
+		attr = normalize(np.asarray(q.querydb(3,0)[0]))
+		target = normalize(np.asarray(q.querydb(3,0)[1]))
+		# print(attr, target)
+		model = Sequential()
+		model.add(Dense(10, input_dim=5, activation='relu'))
+		model.add(Dense(10, activation='relu'))
+		model.add(Dense(1, activation='linear'))
+		#Compile model for efficient use of tensorflow underlying.
+		model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+		#Training the model, tune batch size and epochs.
+		model.fit(attr, target, epochs=20, batch_size=10)
+		#Evaluate our model
+		scores = model.evaluate(attr, target)
+		print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+		#Solve question 4
+
+		#Solve question 5
+
 		#visualize.barGraph(analyze.spearman(query.querydb(1, False)))
+
+	def disconnectDatabase(self):
+		q = query()
+		q.querydb('whatever', 1)
+
+	#Normalizes data
+	def normalize(self, v):
+		norm=np.linalg.norm(v, ord=1)
+		if norm==0:
+			norm=np.finfo(v.dtype).eps
+		return v/norm
 
 class query():
 	def __init__(self):
@@ -39,30 +74,41 @@ class query():
 		cursor = cnx.cursor()
 
 	def querydb(self, num, done):
+		if done == True:
+			#if we are done, disconnect from the database
+			cursor.close()
+			cnx.close()
+
 		if num == 1:
 			a = []
 			#query our database for q1 data
 			query1 = ("SELECT duration, gross "
-					  "FROM Movie")
+					  "FROM Movie;")
 			cursor.execute(query1)
 			for title in cursor:
 				a.append(title)
 			return a
 				#do something with the data (*)
 		elif num == 2:
+			a = []
 			#query our database for q2 data
 			query2 = ()
 			cursor.execute(query2)
-			for x in cursor:
-				pass
+			for title in cursor:
+				a.append(title)
 				#do something with the data (*)
+			return a
 		elif num == 3:
+			attr = []
+			target = []
 			#query our database for q3 data
 			query3 = ()
-			cursor.execute(query3)
-			for x in cursor:
-				pass
-				#do something with the data (*)
+			cursor.execute("SELECT actor_1_facebook_likes, actor_2_facebook_likes, actor_3_facebook_likes, director_facebook_likes, duration, gross"
+							" FROM Movie;")
+			for title in cursor:
+				attr.append(title[:len(title)-1])
+				target.append(title[len(title)-1:])
+			return(attr,target)
 		elif num == 4:
 			#query our database for q4 data
 			query4 = ()
@@ -77,10 +123,6 @@ class query():
 			for x in cursor:
 				pass
 				#do something with the data (*)
-		if done == True:
-			#if we are done, disconnect from the database
-			cursor.close()
-			cnx.close()
 
 class analyze():
 	# have some different analysis functions
@@ -90,21 +132,20 @@ class analyze():
 
 class visualize():
 	# have some different analysis functions
-	def scatter(self,x,y):
+	def scatter(self, x, y, xaxis, yaxis):
 		# Create data
 		N = 500
 		colors = (0,0,40)
-		print(np.amax(x),np.amax(y))
-		area = max(np.amax(x),np.amax(y))
+		print("%s max = %d, %s max = %d" % (xaxis, np.amax(x), yaxis, np.amax(y)))
 
 		# Plot
 		plt.scatter(x, y)
-		plt.title('Correlation between movie duration and revenue')
-		plt.xlabel('duration')
-		plt.ylabel('gross')
+		plt.title('Correlation between movie %s and %s' % (xaxis, yaxis))
+		plt.xlabel(xaxis)
+		plt.ylabel(yaxis)
 		plt.show()
-		#an example of a analysis function
 
 if __name__ == '__main__':
 	main = main()
 	main.solveQuestions()
+	main.disconnectDatabase()
