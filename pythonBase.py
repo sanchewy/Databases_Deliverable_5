@@ -2,9 +2,12 @@ import mysql.connector as sql
 import numpy as np
 import scipy.stats as spicy
 import matplotlib.pyplot as plt
+from scipy.stats import norm
+from sklearn.neighbors.kde import KernelDensity
 from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.preprocessing import normalize
+import time
 
 class main():
 	def __init__(self):
@@ -14,56 +17,87 @@ class main():
 	def solveQuestions(self):
 		q = query()
 		v = visualize()
-		#solve question 1 (spearman correlation coefficient between movie runtime and movie revenue)
-		duration_gross = np.asarray(q.querydb(1,0))
-		duration, gross = zip(*q.querydb(1,0))
-		duration = np.asarray(duration)
-		gross = np.asarray(gross)
-		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
-		v.scatter(duration, gross, 'Duration', 'Gross')
+		# #solve question 1 (spearman correlation coefficient between movie runtime and movie revenue)
+		# duration_gross = np.asarray(q.querydb(1,0))
+		# duration, gross = zip(*q.querydb(1,0))
+		# duration = np.asarray(duration)
+		# gross = np.asarray(gross)
+		# print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
+		# v.scatter(duration, gross, 'Duration', 'Gross')
 
-		#solve question 2
-
-		#solve question 3
-		num_folds = 5
-		#Normalize data from database.
-		attr = normalize(np.asarray(q.querydb(3,0)[0]))
-		target = normalize(np.asarray(q.querydb(3,0)[1]))
-		#Create model (2 hidden layer neural network relu activation)
-		model = Sequential()
-		model.add(Dense(10, input_dim=5, activation='relu'))
-		model.add(Dense(10, activation='relu'))
-		model.add(Dense(1, activation='linear'))
-		#Compile model for efficient use of tensorflow underlying.
-		model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-		fold_accuracy = []
-		for x in range(num_folds):
-			print("%d fold cross validation on fold: %d" % (num_folds,x+1))
-			start_bound = len(attr)/num_folds * x
-			end_bound = start_bound + len(attr)/num_folds
-			#Training the model, tune batch size and epochs.
-			model.fit(np.concatenate((attr[:start_bound], attr[end_bound:len(attr)]), axis=0), np.concatenate((target[:start_bound], target[end_bound:len(target)]), axis=0), epochs=20, batch_size=10)
-			#Evaluate our model using mean squared error
-			scores = model.evaluate(attr[start_bound:end_bound], target[start_bound:end_bound])
-			fold_accuracy.append(scores[1]*100)
-			print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-		print("Final accuracy over all %d folds = %.2f%%" %(num_folds, sum(fold_accuracy)/float(num_folds)))
-
-		#Solve question 4
-		budget_gross = np.asarray(q.querydb(4,0))
-		budget, gross = zip(*q.querydb(4,0))
-		budget = np.asarray(budget)
-		gross = np.asarray(gross)
-		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(budget_gross)[0],spicy.spearmanr(budget_gross)[1]))
-		v.scatter(budget, gross, 'Budget', 'Gross')
+		# #solve question 2
+        #
+		# #solve question 3
+		# num_folds = 5
+		# #Normalize data from database.
+		# attr = normalize(np.asarray(q.querydb(3,0)[0]))
+		# target = normalize(np.asarray(q.querydb(3,0)[1]))
+		# #Create model (2 hidden layer neural network relu activation)
+		# model = Sequential()
+		# model.add(Dense(10, input_dim=5, activation='relu'))
+		# model.add(Dense(10, activation='relu'))
+		# model.add(Dense(1, activation='linear'))
+		# #Compile model for efficient use of tensorflow underlying.
+		# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+		# fold_accuracy = []
+		# for x in range(num_folds):
+		# 	print("%d fold cross validation on fold: %d" % (num_folds,x+1))
+		# 	start_bound = len(attr)/num_folds * x
+		# 	end_bound = start_bound + len(attr)/num_folds
+		# 	#Training the model, tune batch size and epochs.
+		# 	model.fit(np.concatenate((attr[:start_bound], attr[end_bound:len(attr)]), axis=0), np.concatenate((target[:start_bound], target[end_bound:len(target)]), axis=0), epochs=20, batch_size=10)
+		# 	#Evaluate our model using mean squared error
+		# 	scores = model.evaluate(attr[start_bound:end_bound], target[start_bound:end_bound])
+		# 	fold_accuracy.append(scores[1]*100)
+		# 	print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+		# print("Final accuracy over all %d folds = %.2f%%" %(num_folds, sum(fold_accuracy)/float(num_folds)))
+        #
+		# #Solve question 4
+		# budget_gross = np.asarray(q.querydb(4,0))
+		# budget, gross = zip(*q.querydb(4,0))
+		# budget = np.asarray(budget)
+		# gross = np.asarray(gross)
+		# print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(budget_gross)[0],spicy.spearmanr(budget_gross)[1]))
+		# v.scatter(budget, gross, 'Budget', 'Gross')
 
 		#Solve question 5
+		num_reviews = np.asarray(q.querydb(5,0))
+		N = 100
+		np.random.seed(1)
+		X = np.concatenate((np.random.normal(0, 1, int(0.3 * N)),
+		                    np.random.normal(5, 1, int(0.7 * N))))[:, np.newaxis]
 
+		X_plot = np.linspace(-5, max(num_reviews), 1000)[:, np.newaxis]
+
+		fig, ax = plt.subplots()
+
+		for kernel in ['gaussian','tophat', 'epanechnikov']:
+		    kde = KernelDensity(kernel=kernel, bandwidth=2).fit(num_reviews)
+		    log_dens = kde.score_samples(X_plot)
+		    ax.plot(X_plot[:, 0], np.exp(log_dens),'-',
+		            label="kernel = '{0}'".format(kernel), linewidth=1)
+
+		ax.text(500, 0.2, "N={0} points".format(N))
+
+		ax.legend(loc='upper left')
+		ax.plot(num_reviews[:, 0], -0.005 - 0.01 * np.random.random(num_reviews.shape[0]), '+k')
+
+		ax.set_xlim(-100,max(num_reviews))
+		ax.set_ylim(-0.02, 0.05)
+		plt.show()
 		#visualize.barGraph(analyze.spearman(query.querydb(1, False)))
 
 	def disconnectDatabase(self):
 		q = query()
-		q.querydb('whatever', 1)
+		q.querydb('whatever', True)
+
+	def kde_sklearn(self,x, x_grid, bandwidth=0.2, **kwargs):
+	    """Kernel Density Estimation with Scikit-learn"""
+	    kde_skl = KernelDensity(bandwidth=bandwidth, **kwargs)
+	    kde_skl.fit(x[:, np.newaxis])
+	    # score_samples() returns the log-likelihood of the samples
+	    log_pdf = kde_skl.score_samples(x_grid[:, np.newaxis])
+	    return np.exp(log_pdf)
 
 	#Normalizes data
 	def normalize(self, v):
@@ -81,7 +115,6 @@ class query():
 			'database' : 'MovieDataModel',		#db name here (*)
 			'raise_on_warnings' : True,
 		}
-
 		#link to our databse
 		global cnx, cursor
 	 	cnx = sql.connect(**config)
@@ -92,6 +125,7 @@ class query():
 			#if we are done, disconnect from the database
 			cursor.close()
 			cnx.close()
+			return
 
 		if num == 1:
 			a = []
@@ -133,13 +167,18 @@ class query():
 				a.append(title)
 			return a
 				#do something with the data (*)
-		else:
+		elif num == 5:
+			a = []
 			#query our database for q4 data
-			query5 = ()
+			query5 = ("SELECT num_critic_for_reviews "
+						"FROM Movie;")
 			cursor.execute(query5)
-			for x in cursor:
-				pass
+			for title in cursor:
+				a.append(title)
+			return a
 				#do something with the data (*)
+		else:
+			print("Error: Unrecognized query number.")
 
 class analyze():
 	# have some different analysis functions
