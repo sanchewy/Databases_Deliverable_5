@@ -104,14 +104,28 @@ class query():
 			return a
 				#do something with the data (*)
 		elif num == 2:
-			a = []
-			#query our database for q2 data
-			query2 = ()
-			cursor.execute(query2)
-			for title in cursor:
-				a.append(title)
-				#do something with the data (*)
-			return a
+			data = []
+                        #query our database for q2 data
+                        query2 = ("SELECT genres, plot_keywords, title_year "
+                                  "FROM Movie;")
+                        cursor.execute(query2)
+                        #move through each of the results from the query
+                        for title in cursor:
+                                #get only one genre
+                                head, sep, tail = title[0].partition('|')
+                                genre = head
+                                #get only one keyword
+                                keyword = ''
+                                #avoid anything that is null
+                                if title[1] is not None:
+                                        keep, dump, trash = title[1].partition('|')
+                                        keyword = keep
+                                #get the year
+                                year = title[2]
+                                #combine the data and add it to the array
+                                mylist = [genre, year, keyword]
+                                data.append(','.join(map(str, mylist)))
+                        return data
 		elif num == 3:
 			attr = []
 			target = []
