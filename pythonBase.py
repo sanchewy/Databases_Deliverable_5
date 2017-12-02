@@ -22,8 +22,17 @@ class main():
 		duration, gross = zip(*q.querydb(1,0))
 		duration = np.asarray(duration)
 		gross = np.asarray(gross)
+		print("\nSpearman Correlation Coefficient Without Data Cleaning: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
+		v.scatter(duration, gross, 'Duration dirty', 'Gross dirty')
+
+		duration_gross = np.asarray(q.querydb(1,0))
+		print("Size duration_gross before cleaning"+str(duration_gross.size))
+		duration_gross = duration_gross[np.all(duration_gross != 0, axis=1)]
+		print("Size duration_gross after cleaning"+str(np.size(duration_gross)))
+		duration = duration_gross.T[0]
+		gross = duration_gross.T[1]
 		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
-		v.scatter(duration, gross, 'Duration', 'Gross')
+		v.scatter(duration, gross, 'Duration clean', 'Gross clean')
 
 		#solve question 2
 
@@ -58,7 +67,16 @@ class main():
 		budget = np.asarray(budget)
 		gross = np.asarray(gross)
 		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(budget_gross)[0],spicy.spearmanr(budget_gross)[1]))
-		v.scatter(budget, gross, 'Budget', 'Gross')
+		v.scatter(budget, gross, 'Budget dirty', 'Gross dirty')
+
+		budget_gross = np.asarray(q.querydb(4,0))
+		print("Size budget_gross before cleaning"+str(np.size(budget_gross)))
+		budget_gross = budget_gross[np.all(budget_gross != 0, axis=1)]
+		print("Size budget_gross after cleaning"+str(np.size(budget_gross)))
+		budget = budget_gross.T[0]
+		gross = budget_gross.T[1]
+		print("\nSpearman Correlation Coefficient: %.8f, P-Value: %.2f\n" % (spicy.spearmanr(duration_gross)[0],spicy.spearmanr(duration_gross)[1]))
+		v.scatter(budget, gross, 'Budget clean', 'Gross clean')
 
 		#Solve question 5
 		num_reviews = np.asarray(q.querydb(5,0))
@@ -81,7 +99,7 @@ class main():
 		ax.plot(num_reviews[:, 0], -0.005 - 0.01 * np.random.random(num_reviews.shape[0]), '+k')
 
 		ax.set_xlim(-100,max(num_reviews))
-		ax.set_ylim(-0.02, 0.02)
+		ax.set_ylim(-0.02, 0.05)
 		plt.show()
 
 
@@ -92,7 +110,7 @@ class main():
 		ax.text(-3.5, 0.31, "Histogram")
 		ax.plot(num_reviews[:, 0], np.zeros(num_reviews.shape[0]) - 0.001, '+k')
 		ax.set_xlim(-100, max(num_reviews))
-		ax.set_ylim(-0.005, 0.01)
+		ax.set_ylim(-0.005, 0.05)
 		plt.show()
 		#visualize.barGraph(analyze.spearman(query.querydb(1, False)))
 
@@ -179,7 +197,7 @@ class query():
 		elif num == 5:
 			a = []
 			#query our database for q4 data
-			query5 = ("SELECT num_critic_for_reviews "
+			query5 = ("SELECT duration "
 						"FROM Movie;")
 			cursor.execute(query5)
 			for title in cursor:
