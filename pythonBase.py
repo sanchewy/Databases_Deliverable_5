@@ -49,30 +49,30 @@ class main():
 
 		#Solve question 3 (Neural network predicting revenue from facebook likes)
 		#5 fold cross validation is used
-		# num_folds = 5
-		# #Normalize data from database (both the input vectors and the target output vector)
-		# attr = normalize(np.asarray(q.querydb(3,0)[0]))
-		# target = normalize(np.asarray(q.querydb(3,0)[1]))
-		# #Create model (2 hidden layer neural network relu activation on the hidden neurons, 1 linear output neuron)
-		# model = Sequential()
-		# model.add(Dense(10, input_dim=5, activation='relu'))
-		# model.add(Dense(10, activation='relu'))
-		# model.add(Dense(1, activation='linear'))
-		# #Compile model for efficient use of underlying tensorflow libraries.
-		# model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
-		# fold_accuracy = [] #Holds the accuracy results of each of the 5 folds.
-		# #Train network on the training set, evaluate it on the test set, record accuracy.
-		# for x in range(num_folds):
-		# 	print("%d fold cross validation on fold: %d" % (num_folds,x+1))
-		# 	start_bound = len(attr)/num_folds * x
-		# 	end_bound = start_bound + len(attr)/num_folds
-		# 	#Training the model, tune batch size and epochs.
-		# 	model.fit(np.concatenate((attr[:start_bound], attr[end_bound:len(attr)]), axis=0), np.concatenate((target[:start_bound], target[end_bound:len(target)]), axis=0), epochs=20, batch_size=10)
-		# 	#Evaluate our model using mean squared error as the accuracy measure.
-		# 	scores = model.evaluate(attr[start_bound:end_bound], target[start_bound:end_bound])
-		# 	fold_accuracy.append(scores[1]*100)
-		# 	print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-		# print("Final accuracy over all %d folds = %.2f%%" %(num_folds, sum(fold_accuracy)/float(num_folds)))
+		num_folds = 5
+		#Normalize data from database (both the input vectors and the target output vector)
+		attr = normalize(np.asarray(q.querydb(3,0)[0]))
+		target = normalize(np.asarray(q.querydb(3,0)[1]))
+		#Create model (2 hidden layer neural network relu activation on the hidden neurons, 1 linear output neuron)
+		model = Sequential()
+		model.add(Dense(10, input_dim=5, activation='relu'))
+		model.add(Dense(10, activation='relu'))
+		model.add(Dense(1, activation='linear'))
+		#Compile model for efficient use of underlying tensorflow libraries.
+		model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
+		fold_accuracy = [] #Holds the accuracy results of each of the 5 folds.
+		#Train network on the training set, evaluate it on the test set, record accuracy.
+		for x in range(num_folds):
+			print("%d fold cross validation on fold: %d" % (num_folds,x+1))
+			start_bound = len(attr)/num_folds * x
+			end_bound = start_bound + len(attr)/num_folds
+			#Training the model, tune batch size and epochs.
+			model.fit(np.concatenate((attr[:start_bound], attr[end_bound:len(attr)]), axis=0), np.concatenate((target[:start_bound], target[end_bound:len(target)]), axis=0), epochs=20, batch_size=10)
+			#Evaluate our model using mean squared error as the accuracy measure.
+			scores = model.evaluate(attr[start_bound:end_bound], target[start_bound:end_bound])
+			fold_accuracy.append(scores[1]*100)
+			print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+		print("Final accuracy over all %d folds = %.2f%%" %(num_folds, sum(fold_accuracy)/float(num_folds)))
 
 		#Solve question 4 (Spearman correlation between Movie budget and revenue).
 		#Version without data cleaning
