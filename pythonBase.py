@@ -116,11 +116,11 @@ class main():
 		#Plot the individual point values below the axis of the graph.
 		ax.text(500, 0.2, "N={0} points".format(N))
 		#Legend
-		ax.legend(loc='upper left')
+		ax.legend(loc='upper right')
 		ax.plot(num_reviews[:, 0], -0.005 - 0.01 * np.random.random(num_reviews.shape[0]), '+k')
 		#Set axis values for the graph
 		ax.set_xlim(-100,max(num_reviews))
-		ax.set_ylim(-0.02, 0.05)
+		ax.set_ylim(-0.02, 0.03)
 		plt.show()
 
 		#This is for the plain old histogram with no kernel density estimation.
@@ -133,7 +133,7 @@ class main():
 		#Plot the individual data points below the axis of the graph.
 		ax.plot(num_reviews[:, 0], np.zeros(num_reviews.shape[0]) - 0.001, '+k')
 		ax.set_xlim(-100, max(num_reviews))
-		ax.set_ylim(-0.005, 0.05)
+		ax.set_ylim(-0.005, 0.03)
 		plt.show()
 
 	#Sever the connection with the database.
