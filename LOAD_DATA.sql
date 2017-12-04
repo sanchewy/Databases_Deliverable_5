@@ -98,5 +98,5 @@ LINES TERMINATED BY '\r\n' STARTING BY ''
 IGNORE 1 LINES
 ;
 
-
+select * from MovieDataModel.Movie;
 
