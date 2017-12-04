@@ -157,6 +157,7 @@ CREATE TABLE IF NOT EXISTS `MovieDataModel`.`Movie` (
   `plot_keywords` LONGTEXT NULL DEFAULT NULL,
   `num_user_for_reviews` INT(10) NULL,
   `budget` INT(10) NULL,
+  `genres` VARCHAR(128),
   PRIMARY KEY (`movie_title`),
   CONSTRAINT `movie_fk`
     FOREIGN KEY (`movie_title`)
@@ -225,3 +226,5 @@ CREATE TABLE IF NOT EXISTS `MovieDataModel`.`Votes` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+-- drop database MovieDataModel;

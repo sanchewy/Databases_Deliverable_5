@@ -35,9 +35,9 @@ class main():
 
                 #Version with data cleaning
                 duration_gross = np.asarray(q.querydb(1,0))
-                print("Size duration_gross before cleaning"+str(duration_gross.size))
+                print("Size duration_gross before cleaning "+str(duration_gross.size))
                 duration_gross = duration_gross[np.all(duration_gross != 0, axis=1)]
-                print("Size duration_gross after cleaning"+str(np.size(duration_gross)))
+                print("Size duration_gross after cleaning "+str(np.size(duration_gross)))
                 duration = duration_gross.T[0]
                 gross = duration_gross.T[1]
                 #Calculate coefficient and p-value
@@ -46,37 +46,37 @@ class main():
                 v.scatter(duration, gross, 'Duration clean', 'Gross clean')
 
                 #Solve question 2
-                firstYear = '2222'
-                endYear = '0000'
-                global year 
-                data = q.querydb(2,0)
-                yearData = [None]*100
-                for x in data:
-                        #extract the data we want from the string
-                        year, junk, genre = x.partition(',')
-                        #find the upper and lower bounds of our list
-                        if year != 'None':
-                                if year < firstYear:
-                                        firstYear = year
-                                elif year > endYear:
-                                        endYear = year
-                        if year != 'None':
-                                # find its location and add genre to th data structure
-                                index = int(year) - int(firstYear)
-                                yearData.insert(index, genre)
-                myList = []
-                newList = []
-                #get the counts for each genre
-                for y in yearData:
-                        if y not in myList and y != None:
-                                mylist= [y, yearData.count(y)]
-                                newList.append(','.join(map(str, mylist)))
-                                myList.append(y)
-                #print the results
-                print('From 1916 to 2016 the most common genres and thier counts are: ')
-                for z in newList:
-                        genre, junk, count = z.partition(',')
-                        print('%s --> %s' % (genre, count))  
+                # firstYear = '2222'
+                # endYear = '0000'
+                # global year
+                # data = q.querydb(2,0)
+                # yearData = [None]*100
+                # for x in data:
+                #         #extract the data we want from the string
+                #         year, junk, genre = x.partition(',')
+                #         #find the upper and lower bounds of our list
+                #         if year != 'None':
+                #                 if year < firstYear:
+                #                         firstYear = year
+                #                 elif year > endYear:
+                #                         endYear = year
+                #         if year != 'None':
+                #                 # find its location and add genre to th data structure
+                #                 index = int(year) - int(firstYear)
+                #                 yearData.insert(index, genre)
+                # myList = []
+                # newList = []
+                # #get the counts for each genre
+                # for y in yearData:
+                #         if y not in myList and y != None:
+                #                 mylist= [y, yearData.count(y)]
+                #                 newList.append(','.join(map(str, mylist)))
+                #                 myList.append(y)
+                # #print the results
+                # print('From 1916 to 2016 the most common genres and thier counts are: ')
+                # for z in newList:
+                #         genre, junk, count = z.partition(',')
+                #         print('%s --> %s' % (genre, count))
 
                 #Solve question 3 (Neural network predicting revenue from facebook likes)
                 #5 fold cross validation is used
@@ -118,9 +118,9 @@ class main():
 
                 #Version with data cleaning
                 budget_gross = np.asarray(q.querydb(4,0))
-                print("Size budget_gross before cleaning"+str(np.size(budget_gross)))
+                print("Size budget_gross before cleaning "+str(np.size(budget_gross)))
                 budget_gross = budget_gross[np.all(budget_gross != 0, axis=1)]
-                print("Size budget_gross after cleaning"+str(np.size(budget_gross)))
+                print("Size budget_gross after cleaning "+str(np.size(budget_gross)))
                 budget = budget_gross.T[0]
                 gross = budget_gross.T[1]
                 #Calculate coefficient and p-value
@@ -239,7 +239,7 @@ class query():
                                 mylist = [genre, year, keyword]
                                 data.append(','.join(map(str, mylist)))
                         return data
-                
+
                 #Query for question 3.
                 elif num == 3:
                         attr = []
